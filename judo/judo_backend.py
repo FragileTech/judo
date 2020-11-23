@@ -1,6 +1,7 @@
 from contextlib import contextmanager
 import os
 
+import numpy
 import yaml
 
 try:
@@ -19,7 +20,7 @@ except ImportError:
 
     class torch:
         cuda = cuda
-        Tensor = list
+        Tensor = numpy.ndarray
         random = torch_random
 
 
