@@ -1,3 +1,5 @@
 backend: numpy
 copy: false
+device: cpu
+requires_grad: null
 true_hash: false

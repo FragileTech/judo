@@ -1,4 +1,4 @@
-FROM fragiletech/ubuntu20.04-base-py38
+FROM fragiletech/ubuntu20.04-cuda-11.0-py38
 ARG JUPYTER_PASSWORD=""
 ENV BROWSER=/browser \
     LC_ALL=en_US.UTF-8 \

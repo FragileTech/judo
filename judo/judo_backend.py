@@ -27,15 +27,20 @@ FALLBACK_DEFAULTS = {
     "backend": "numpy",
     "device": "cpu",
     "requires_grad": None,
-    "true_hash": True,
+    "true_hash": False,
     "copy": False,
 }
 config_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "config.yml")
 
 
 def load_backend_config(filepath=config_file):
-    with open(filepath, "r") as stream:
-        config = yaml.safe_load(stream)
+    try:
+        with open(filepath, "r") as stream:
+            config = yaml.safe_load(stream)
+    except FileNotFoundError:
+        with open(filepath, "w") as file:
+            yaml.dump(FALLBACK_DEFAULTS, file)
+        config = FALLBACK_DEFAULTS
     backend = config.get("backend", FALLBACK_DEFAULTS["backend"])
     device = config.get("device", FALLBACK_DEFAULTS["device"])
     if device == "auto":
