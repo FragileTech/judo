@@ -19,7 +19,7 @@ except ImportError:
 
     class torch:
         cuda = cuda
-        Tensor = None
+        Tensor = list
         random = torch_random
 
 
