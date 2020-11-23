@@ -34,6 +34,7 @@ setup(
         "networkx > 2.0.0",
     ],
     package_data={"": ["README.md"], "judo": ["judo/config.yml"]},
+    include_package_data=True,
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Environment :: Console",
