@@ -1,7 +1,12 @@
 import pytest
 
 import judo
-from judo.tests.test_backend import backend
+from judo import Backend
+
+
+@pytest.fixture()
+def backend():
+    return Backend
 
 
 class TestAPI:

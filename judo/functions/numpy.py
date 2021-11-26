@@ -1,5 +1,6 @@
 import numpy
 
+
 AVAILABLE_FUNCTIONS = [
     "argmax",
     "hash_numpy",

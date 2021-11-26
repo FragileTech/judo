@@ -4,6 +4,7 @@ import numpy
 
 from judo.judo_backend import torch
 
+
 StateDict = Dict[str, Dict[str, Any]]
 
 Tensor = Union[numpy.ndarray, torch.Tensor]

@@ -1,7 +1,6 @@
 import copy
 from typing import Dict, Generator, Iterable, List, Optional, Tuple, Union
 
-
 import numpy
 
 import judo
@@ -83,8 +82,9 @@ class States:
         else:
             raise TypeError(
                 "item must be an instance of str, got {} of type {} instead".format(
-                    item, type(item)
-                )
+                    item,
+                    type(item),
+                ),
             )
 
     def _ix(self, index: int):
@@ -176,7 +176,7 @@ class States:
                 else:
                     raise ValueError(
                         "Could not infer data concatenation for attribute %s  with shape %s"
-                        % (name, data.shape)
+                        % (name, data.shape),
                     )
                 vals.append(value)
             return judo.concatenate(vals)

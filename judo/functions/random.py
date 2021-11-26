@@ -45,7 +45,10 @@ class TorchRandomState(metaclass=MetaTorchRandomState):
 
     @staticmethod
     def uniform(
-        low=0.0, high=1.0, size=None, dtype=None,
+        low=0.0,
+        high=1.0,
+        size=None,
+        dtype=None,
     ):
         uniform = torch.distributions.uniform.Uniform(low, high)
         if size is not None:

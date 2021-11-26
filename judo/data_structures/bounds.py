@@ -83,7 +83,11 @@ class Bounds:
 
     def __repr__(self):
         return "{} shape {} dtype {} low {} high {}".format(
-            self.__class__.__name__, self.dtype, self.shape, self.low, self.high
+            self.__class__.__name__,
+            self.dtype,
+            self.shape,
+            self.low,
+            self.high,
         )
 
     def __len__(self) -> int:
@@ -130,7 +134,9 @@ class Bounds:
 
     @staticmethod
     def get_scaled_intervals(
-        low: Union[Tensor, float, int], high: Union[Tensor, float, int], scale: float,
+        low: Union[Tensor, float, int],
+        high: Union[Tensor, float, int],
+        scale: float,
     ) -> Tuple[Union[Tensor, float], Union[Tensor, float]]:
         """
         Scale the high and low vectors by an scale factor.

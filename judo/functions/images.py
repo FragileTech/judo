@@ -1,6 +1,7 @@
 import judo
 from judo.typing import Tensor
 
+
 AVAILABLE_FUNCTIONS = {"resize_image"}
 
 

@@ -4,6 +4,7 @@ import numpy
 
 from judo.judo_backend import Backend, torch
 
+
 DATA_TYPE_NAMES = {
     "bool",
     "int",

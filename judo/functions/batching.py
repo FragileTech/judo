@@ -5,6 +5,7 @@ import numpy
 import judo
 from judo.typing import Tensor
 
+
 AVAILABLE_FUNCTIONS = {
     "similiar_chunks_indexes",
     "split_similar_chunks",
@@ -14,7 +15,9 @@ AVAILABLE_FUNCTIONS = {
 
 
 def similiar_chunks_indexes(
-    n_values, n_chunks, allow_size_1: bool = True
+    n_values,
+    n_chunks,
+    allow_size_1: bool = True,
 ) -> Generator[Tuple[int, int], None, None]:
     """
     Return the indexes for splitting an array in similar chunks.
@@ -39,7 +42,9 @@ def similiar_chunks_indexes(
 
 
 def split_similar_chunks(
-    vector: Union[list, Tensor], n_chunks: int, allow_size_1: bool = True
+    vector: Union[list, Tensor],
+    n_chunks: int,
+    allow_size_1: bool = True,
 ) -> Generator[Union[list, Tensor], None, None]:
     """
     Split an indexable object into similar chunks.
@@ -59,7 +64,9 @@ def split_similar_chunks(
 
 
 def split_kwargs_in_chunks(
-    kwargs: Dict[str, Union[list, Tensor]], n_chunks: int, allow_size_1: bool = True
+    kwargs: Dict[str, Union[list, Tensor]],
+    n_chunks: int,
+    allow_size_1: bool = True,
 ) -> Generator[Dict[str, Union[list, Tensor]], None, None]:
     """Split the kwargs passed to ``make_transitions`` in similar batches."""
     n_values = len(next(iter(kwargs.values())))  # Assumes all data have the same len
@@ -73,7 +80,9 @@ def split_kwargs_in_chunks(
 
 
 def split_args_in_chunks(
-    args: Tuple[Union[list, Tensor]], n_chunks: int, allow_size_1: bool = True
+    args: Tuple[Union[list, Tensor]],
+    n_chunks: int,
+    allow_size_1: bool = True,
 ) -> Generator[Union[list, Tensor], None, None]:
     """Split the args passed to ``make_transitions`` in similar batches."""
     n_values = len(args[0])
