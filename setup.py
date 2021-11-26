@@ -28,7 +28,15 @@ setup(
     test_suite="tests",
     tests_require=["pytest>=5.3.5", "hypothesis>=5.6.0"],
     extras_require={},
-    install_requires=[],
+    install_requires=[
+        "numpy>=1.0.0",
+        "pyyaml>=5.0.0",
+        "xxhash>=1.1.0",
+        "pillow-simd>=7.0.0",
+        "networkx > 2.0.0",
+        "ipython >= 7.0.0",
+        "torch>=1.0.0",
+    ],
     package_data={"": ["README.md"], "judo": ["config.yml"]},
     classifiers=[
         "Development Status :: 3 - Alpha",
