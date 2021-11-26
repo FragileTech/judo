@@ -42,6 +42,9 @@ class Hasher:
         }
         return Backend.execute(x, funcs)
 
+    def __del__(self):
+        self.pool.close()
+
     def get_one_id(self):
         self._seed += 1
         return self._seed

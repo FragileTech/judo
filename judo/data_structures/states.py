@@ -58,7 +58,7 @@ class States:
         self.update(**self._attr_dict)
         self._batch_size = batch_size
 
-    def __len__(self):
+    def __len__(self) -> int:
         """Length is equal to batch_size."""
         return self._batch_size
 
@@ -148,12 +148,12 @@ class States:
             vals = []
             for state in states_list:
                 data = state[name]
-                # Attributes that are not numpy arrays are not stacked.
+                # Attributes that are not tensors are not stacked.
                 if not judo.is_tensor(data):
                     return data
                 state_len = len(state)
                 if len(data.shape) == 0 and state_len == 1:
-                    # Name is scaler vector. Data is typing.Scalar value. Transform to array first
+                    # Name is scalar vector. Data is typing.Scalar value. Transform to array first
                     value = tensor([data]).flatten()
                 elif len(data.shape) == 1 and state_len == 1:
                     if data.shape[0] == 1:
@@ -230,7 +230,8 @@ class States:
 
         """
         if self.n <= 1:
-            return self.vals()
+            yield self.vals()
+            raise StopIteration
         for i in range(self.n):
             yield tuple([v[i] for v in self.vals()])
 
