@@ -73,8 +73,8 @@ class Hasher:
                     [
                         self.hash_tensor(x) if k in state._tensor_names else hash(x)
                         for k, x in state.items()
-                    ]
-                )
+                    ],
+                ),
             )
             return _hash
         return 0

@@ -4,6 +4,7 @@ import os
 import numpy
 import yaml
 
+
 try:
     import torch
 except ImportError:
@@ -123,7 +124,7 @@ class Backend:
     def _check_valid_backend(cls, name):
         if name not in cls.AVAILABLE_BACKENDS:
             raise ValueError(
-                "%s not supported. Available backends: %s" % (name, cls.AVAILABLE_BACKENDS)
+                "%s not supported. Available backends: %s" % (name, cls.AVAILABLE_BACKENDS),
             )
 
     @classmethod

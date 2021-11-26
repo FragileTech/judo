@@ -156,14 +156,19 @@ def cross_virtual_reward(
 
 
 def cross_clone(
-    host_virtual_rewards: Tensor, ext_virtual_rewards: Tensor, host_oobs: Tensor = None, eps=1e-3,
+    host_virtual_rewards: Tensor,
+    ext_virtual_rewards: Tensor,
+    host_oobs: Tensor = None,
+    eps=1e-3,
 ):
     """Perform a clone operation between two different groups of points."""
     compas_ix = random_state.permutation(judo.arange(len(ext_virtual_rewards)))
     host_vr = judo.astype(host_virtual_rewards.flatten(), dtype=dtype.float32)
     ext_vr = judo.astype(ext_virtual_rewards.flatten(), dtype=dtype.float32)
     clone_probs = (ext_vr[compas_ix] - host_vr) / judo.where(
-        ext_vr > eps, ext_vr, tensor(eps, dtype=dtype.float32)
+        ext_vr > eps,
+        ext_vr,
+        tensor(eps, dtype=dtype.float32),
     )
     will_clone = clone_probs.flatten() > random_state.random(len(clone_probs))
     if host_oobs is not None:
@@ -195,6 +200,9 @@ def cross_fai_iteration(
     )
 
     compas_ix, will_clone = cross_clone(
-        host_virtual_rewards=host_vr, ext_virtual_rewards=ext_vr, host_oobs=host_oobs, eps=eps
+        host_virtual_rewards=host_vr,
+        ext_virtual_rewards=ext_vr,
+        host_oobs=host_oobs,
+        eps=eps,
     )
     return compas_ix, will_clone

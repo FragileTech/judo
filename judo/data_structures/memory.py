@@ -13,7 +13,10 @@ class ReplayMemory:
     _log = logging.getLogger("Memory")
 
     def __init__(
-        self, max_size: int, names: Union[List[str], Tuple[str]], min_size: int = None,
+        self,
+        max_size: int,
+        names: Union[List[str], Tuple[str]],
+        min_size: int = None,
     ):
         """
         Initialize a :class:`ReplayMemory`.
@@ -71,7 +74,7 @@ class ReplayMemory:
         with Backend.use_backend("numpy"):
             indexes = random_state.permutation(range(len(self)))
             for i in range(0, len(self), batch_size):
-                batch_ix = indexes[i : i + batch_size]
+                batch_ix = indexes[i : i + batch_size]  # noqa: E203
                 data = tuple([getattr(self, val)[batch_ix] for val in self.names])
                 if as_dict:
                     yield dict(zip(self.names, data))

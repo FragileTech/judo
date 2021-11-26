@@ -24,7 +24,7 @@ AVAILABLE_FUNCTIONS = set(
     + list(functions.batching.AVAILABLE_FUNCTIONS)
     + list(functions.fractalai.AVAILABLE_FUNCTIONS)
     + list(functions.images.AVAILABLE_FUNCTIONS)
-    + list(functions.notebook.AVAILABLE_FUNCTIONS)
+    + list(functions.notebook.AVAILABLE_FUNCTIONS),
 )
 
 

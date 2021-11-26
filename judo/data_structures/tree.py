@@ -42,7 +42,12 @@ class BaseTree:
         """
         return self
 
-    def add_states(self, parent_ids: List[int], n_iter: int = None, **kwargs,) -> None:
+    def add_states(
+        self,
+        parent_ids: List[int],
+        n_iter: int = None,
+        **kwargs,
+    ) -> None:
         """
         Update the history of the tree adding the necessary data to recreate a \
         the trajectories sampled by the :class:`Swarm`.
@@ -220,7 +225,10 @@ class NetworkxTree(BaseTree):
             self.prune_dead_branches(dead_leafs=dead_leafs, alive_leafs=alive_leafs)
 
     def reset_graph(
-        self, node_data: Dict[str, Any], root_id: NodeId = None, epoch: int = -1
+        self,
+        node_data: Dict[str, Any],
+        root_id: NodeId = None,
+        epoch: int = -1,
     ) -> None:
         """
         Delete all the data currently stored and reset the internal state of \
@@ -283,10 +291,11 @@ class NetworkxTree(BaseTree):
             if parent_id not in self.data.nodes:
                 raise ValueError("Parent not in graph")
             import copy
+
             self.data.add_node(leaf_id, epoch=epoch, **copy.deepcopy(node_data))
             self.data.add_edge(parent_id, leaf_id, **copy.deepcopy(edge_data))
-            #self.data.add_node(leaf_id, epoch=epoch, **node_data)
-            #self.data.add_edge(parent_id, leaf_id, **edge_data)
+            # self.data.add_node(leaf_id, epoch=epoch, **node_data)
+            # self.data.add_edge(parent_id, leaf_id, **edge_data)
             self.leafs.add(leaf_id)
             self._node_count += 1
             # If parent is no longer a leaf remove it from the list of leafs
@@ -422,7 +431,12 @@ class NetworkxTree(BaseTree):
         self.data = nx.compose(self.data, other.data)
 
     def _extract_data_from_states(
-        self, index, env_states, model_states, walkers_states, only_node_data: bool = False
+        self,
+        index,
+        env_states,
+        model_states,
+        walkers_states,
+        only_node_data: bool = False,
     ):
         def get_name_from_states(name):
             if hasattr(env_states, name):
@@ -544,7 +558,10 @@ class HistoryTree(NetworkxTree):
         return tuple(judo.as_tensor(val) for val in unpacked)
 
     def _generate_batches(
-        self, generator: NodeDataGenerator, names: NamesData, batch_size: int = None,
+        self,
+        generator: NodeDataGenerator,
+        names: NamesData,
+        batch_size: int = None,
     ) -> Generator[Tuple, None, None]:
         """Return batches of processed data represented as tuples of arrays."""
         returned = []
@@ -570,12 +587,16 @@ class HistoryTree(NetworkxTree):
         if names is None:
             return self.names
         for name in names:
-            name = name[len(self.next_prefix) :] if name.startswith(self.next_prefix) else name
+            name = (
+                name[len(self.next_prefix) :]  # noqa: E203
+                if name.startswith(self.next_prefix)
+                else name
+            )
             if name not in self.names:
                 raise KeyError(
                     "Data corresponding to name %s "
                     "not present in self.names: %s for element %s"
-                    % (name, self.names, name[len(self.next_prefix) :])
+                    % (name, self.names, name[len(self.next_prefix) :]),  # noqa: E203
                 )
         return names
 
@@ -669,12 +690,15 @@ class HistoryTree(NetworkxTree):
         names = self._validate_names(names)
         return_children = any(name.startswith(self.next_prefix) for name in names)
         path_generator = self.path_data_generator(
-            node_ids=judo.to_numpy(node_ids), return_children=return_children
+            node_ids=judo.to_numpy(node_ids),
+            return_children=return_children,
         )
         return self._generate_batches(path_generator, names=names, batch_size=batch_size)
 
     def iterate_nodes_at_random(
-        self, batch_size: int = None, names: NamesData = None
+        self,
+        batch_size: int = None,
+        names: NamesData = None,
     ) -> NodeDataGenerator:
         """
         Return a generator that yields the data of the nodes contained in the provided path.
@@ -696,7 +720,10 @@ class HistoryTree(NetworkxTree):
         return self._generate_batches(node_generator, names=names, batch_size=batch_size)
 
     def iterate_branch(
-        self, node_id: NodeId, batch_size: int = None, names: NamesData = None,
+        self,
+        node_id: NodeId,
+        batch_size: int = None,
+        names: NamesData = None,
     ) -> NodeDataGenerator:
         """
         Return a generator that yields the data of the nodes contained in the provided path.
