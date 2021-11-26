@@ -38,8 +38,6 @@ def relativize(x: Tensor) -> Tensor:
     standard = (x - x.mean()) / std
     with numpy.errstate(invalid="ignore", divide="ignore"):
         res = judo.where(standard > 0.0, judo.log(1.0 + standard) + 1.0, judo.exp(standard))
-    # standard[standard > 0] = judo.log(1.0 + standard[standard > 0]) + 1.0
-    # standard[standard <= 0] = judo.exp(standard[standard <= 0])
     return res
 
 
