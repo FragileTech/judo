@@ -2,6 +2,7 @@ from judo.data_types import dtype
 from judo.judo_backend import torch
 from judo.judo_tensor import astype, tensor
 
+
 AVAILABLE_FUNCTIONS = [
     "argmax",
     "hash_numpy",

@@ -34,7 +34,11 @@ def _new_torch_tensor_copy(x, dtype=None, device=None, requires_grad=None, pin_m
     # TODO(guillemdb): benchmark different alternatives and implement the fastest
     requires_grad = requires_grad and is_floating_object(x)
     return torch.tensor(
-        x, dtype=dtype, device=device, requires_grad=requires_grad, pin_memory=pin_memory
+        x,
+        dtype=dtype,
+        device=device,
+        requires_grad=requires_grad,
+        pin_memory=pin_memory,
     )
 
 
@@ -59,7 +63,11 @@ def _new_torch_tensor_avoid_copy(x, dtype=None, device=None, requires_grad=None)
 def new_torch_tensor(x, dtype=None, device=None, requires_grad=None, copy=False, pin_memory=False):
     if copy:
         return _new_torch_tensor_copy(
-            x, dtype=dtype, device=device, requires_grad=requires_grad, pin_memory=pin_memory
+            x,
+            dtype=dtype,
+            device=device,
+            requires_grad=requires_grad,
+            pin_memory=pin_memory,
         )
     return _new_torch_tensor_avoid_copy(x, dtype=dtype, device=device, requires_grad=requires_grad)
 
@@ -82,7 +90,10 @@ def new_backend_tensor(
     pin_memory: bool = False,
 ):
     kwargs = update_with_backend_values(
-        requires_grad=requires_grad, device=device, copy=copy, dtype=dtype
+        requires_grad=requires_grad,
+        device=device,
+        copy=copy,
+        dtype=dtype,
     )
     if Backend.is_numpy():
         return new_numpy_array(x, dtype=kwargs.get("dtype"), copy=kwargs.get("copy"))
@@ -161,7 +172,10 @@ def update_with_backend_values(**kwargs):
 
 
 def to_backend(
-    x: "Tensor", requires_grad: bool = None, device: str = None, copy: bool = None
+    x: "Tensor",
+    requires_grad: bool = None,
+    device: str = None,
+    copy: bool = None,
 ) -> Tensor:
     kwargs = update_with_backend_values(requires_grad=requires_grad, device=device, copy=copy)
     if Backend.is_numpy():

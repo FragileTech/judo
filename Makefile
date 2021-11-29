@@ -1,12 +1,19 @@
 current_dir = $(shell pwd)
 
 PROJECT = judo
+n ?= auto
 DOCKER_ORG = fragiletech
+DOCKER_TAG ?= ${PROJECT}
 VERSION ?= latest
 
 .POSIX:
+style:
+	black .
+	isort .
+
+.POSIX:
 check:
-	!(grep -R /tmp ${PROJECT}/tests)
+	!(grep -R /tmp tests)
 	flakehell lint ${PROJECT}
 	pylint ${PROJECT}
 	black --check ${PROJECT}
@@ -14,46 +21,44 @@ check:
 .PHONY: test
 test:
 	find -name "*.pyc" -delete
-	pytest -s
+	pytest -n $n -s -o log_cli=true -o log_cli_level=info
 
-.PHONY: pipenv-build
-pipenv-build:
-	# Rename pyproject.toml to avoid pep 517 errors when using pipenv
-	if [ -f pyproject.toml ]; then mv pyproject.toml _pyproject.toml; fi
+.PHONY: test-codecov
+test-codecov:
+	find -name "*.pyc" -delete
+	pytest -n $n -s -o log_cli=true -o log_cli_level=info --cov=./ --cov-report=xml --cov-config=pyproject.toml
+
+.PHONY: pipenv-install
+pipenv-install:
 	rm -rf *.egg-info && rm -rf build && rm -rf __pycache__
 	rm -f Pipfile && rm -f Pipfile.lock
-	pipenv install --skip-lock --dev -r requirements-test.txt
-	pipenv install --skip-lock --pre --dev -r requirements-lint.txt
-	pipenv install --skip-lock -r requirements.txt
-	pipenv install --skip-lock .
+	pipenv install --dev -r requirements-test.txt
+	pipenv install --pre --dev -r requirements-lint.txt
+	pipenv install -r requirements.txt
+	pipenv install -e .
 	pipenv lock
-	if [ -f _pyproject.toml ]; then mv _pyproject.toml pyproject.toml; fi
 
 .PHONY: pipenv-test
 pipenv-test:
 	find -name "*.pyc" -delete
 	pipenv run pytest -s
 
-.PHONY: docker-test
-docker-test:
-	find -name "*.pyc" -delete
-	docker run --rm -it --network host -w /${PROJECT} --entrypoint python3 ${DOCKER_ORG}/${PROJECT}:${VERSION} -m pytest
+.PHONY: docker-shell
+docker-shell:
+	docker run --rm --gpus all -v ${current_dir}:/${PROJECT} --network host -w /${PROJECT} -it ${DOCKER_ORG}/${PROJECT}:${VERSION} bash
 
+.PHONY: docker-notebook
+docker-notebook:
+	docker run --rm --gpus all -v ${current_dir}:/${PROJECT} --network host -w /${PROJECT} -it ${DOCKER_ORG}/${PROJECT}:${VERSION}
 
 .PHONY: docker-build
 docker-build:
 	docker build --pull -t ${DOCKER_ORG}/${PROJECT}:${VERSION} .
 
-
-.PHONY: remove-dev-packages
-remove-dev-packages:
-	pip3 uninstall -y cython && \
-	apt-get remove -y cmake pkg-config flex bison curl libpng-dev \
-		libjpeg-turbo8-dev zlib1g-dev libhdf5-dev libopenblas-dev gfortran \
-		libfreetype6-dev libjpeg8-dev libffi-dev && \
-	apt-get autoremove -y && \
-	apt-get clean && \
-	rm -rf /var/lib/apt/lists/*
+.PHONY: docker-test
+docker-test:
+	find -name "*.pyc" -delete
+	docker run --rm --network host -w /${PROJECT} --entrypoint python3 ${DOCKER_ORG}/${PROJECT}:${VERSION} -m pytest -n $n -s -o log_cli=true -o log_cli_level=info
 
 .PHONY: docker-push
 docker-push:
