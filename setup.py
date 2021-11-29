@@ -32,7 +32,7 @@ setup(
         "numpy>=1.0.0",
         "pyyaml>=5.0.0",
         "xxhash>=1.1.0",
-        "pillow-simd>=7.0.0",
+        "pillow>=7.0.0",
         "networkx > 2.0.0",
         "ipython >= 7.0.0",
         "torch>=1.0.0",
