@@ -1,8 +1,15 @@
-import networkx
 import pytest
 
-import judo
-from judo.data_structures.tree import HistoryTree, NetworkxTree, to_node_id
+
+try:
+    import networkx
+
+    from judo.data_structures.tree import HistoryTree, NetworkxTree, to_node_id
+    from judo.functions.api import API
+
+    MISSING_IMPORTS = False
+except ImportError:
+    MISSING_IMPORTS = True
 
 
 def random_powerlaw():
@@ -14,8 +21,8 @@ def random_powerlaw():
 
 
 def small_tree():
-    node_data = {"a": judo.arange(10), "b": judo.zeros(10)}
-    edge_data = {"c": judo.ones(10)}
+    node_data = {"a": API.arange(10), "b": API.zeros(10)}
+    edge_data = {"c": API.ones(10)}
     g = networkx.DiGraph()
     for i in range(8):
         g.add_node(to_node_id(i), **node_data)
@@ -32,6 +39,7 @@ def tree(request):
     return tree
 
 
+@pytest.mark.skipif(MISSING_IMPORTS, reason="networkx not installed")
 class TestNetworkxTree:
     def test_init(self, tree):
         pass
@@ -47,7 +55,7 @@ class TestNetworkxTree:
         assert tree.data.nodes[root_id]["miau"] == 2104
 
     def test_append_leaf(self, tree):
-        node_data = {"node": judo.arange(10)}
+        node_data = {"node": API.arange(10)}
         edge_data = {"edge": False}
         leaf_id = to_node_id(-421)
         epoch = 123

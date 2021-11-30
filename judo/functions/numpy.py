@@ -2,6 +2,7 @@ import numpy
 
 
 AVAILABLE_FUNCTIONS = [
+    "abs",
     "argmax",
     "hash_numpy",
     "hash_tensor",
@@ -19,6 +20,11 @@ AVAILABLE_FUNCTIONS = [
     "logical_or",
     "logical_and",
     "logical_not",
+    "ones",
+    "zeros",
+    "arange",
+    "full_like",
+    "allclose",
 ]
 
 
@@ -86,3 +92,27 @@ def logical_and(a, b):
 
 def logical_not(x):
     return numpy.logical_not(x)
+
+
+def ones(*args, **kwargs):
+    return numpy.ones(*args, **kwargs)
+
+
+def zeros(*args, **kwargs):
+    return numpy.zeros(*args, **kwargs)
+
+
+def arange(*args, **kwargs):
+    return numpy.arange(*args, **kwargs)
+
+
+def abs(*args, **kwargs):
+    return numpy.abs(*args, **kwargs)
+
+
+def allclose(*args, **kwargs):
+    return numpy.allclose(*args, **kwargs)
+
+
+def full_like(*args, **kwargs):
+    return numpy.full_like(*args, **kwargs)

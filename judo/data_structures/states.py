@@ -4,6 +4,7 @@ from typing import Dict, Generator, Iterable, List, Optional, Tuple, Union
 import numpy
 
 import judo
+from judo.functions.api import API
 from judo.functions.hashing import hasher
 from judo.judo_tensor import tensor
 from judo.typing import StateDict, Tensor
@@ -89,9 +90,7 @@ class States:
 
     def _ix(self, index: int):
         # TODO(guillemdb): Allow slicing
-        data = {
-            k: judo.unsqueeze(v[index], 0) if judo.is_tensor(v) else v for k, v in self.items()
-        }
+        data = {k: API.unsqueeze(v[index], 0) if judo.is_tensor(v) else v for k, v in self.items()}
         return self.__class__(batch_size=1, **data)
 
     def __setitem__(self, key, value: Union[Tuple, List, Tensor]):
@@ -125,9 +124,9 @@ class States:
         """Return a unique id for a given attribute."""
         return hasher.hash_tensor(self[name])
 
-    def hash_walkers(self, name: str) -> List[int]:
+    def hash_attribute(self, name: str) -> List[int]:
         """Return a unique id for each walker attribute."""
-        return hasher.hash_walkers(self[name])
+        return hasher.hash_iterable(self[name])
 
     @staticmethod
     def merge_states(states: Iterable["States"]) -> "States":
@@ -179,7 +178,7 @@ class States:
                         % (name, data.shape),
                     )
                 vals.append(value)
-            return judo.concatenate(vals)
+            return API.concatenate(vals)
 
         # Assumes all states have the same names.
         data = {name: merge_one_name(states, name) for name in states[0]._names}
@@ -263,7 +262,7 @@ class States:
                     return len(attr[start:end])
             return int(numpy.ceil(self.n / n_chunks))
 
-        for start, end in judo.similiar_chunks_indexes(self.n, n_chunks):
+        for start, end in API.similiar_chunks_indexes(self.n, n_chunks):
             chunk_size = get_chunck_size(self, start, end)
             data = {k: val[start:end] if judo.is_tensor(val) else val for k, val in self.items()}
             new_state = self.__class__(batch_size=chunk_size, **data)
@@ -337,5 +336,5 @@ class States:
                 del val["size"]
             if "shape" in val:
                 del val["shape"]
-            tensor_dict[key] = judo.zeros(sizes, **val)
+            tensor_dict[key] = API.zeros(sizes, **val)
         return tensor_dict

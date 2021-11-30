@@ -1,7 +1,4 @@
-try:
-    from torch.multiprocessing.pool import Pool
-except ImportError:
-    from multiprocessing.pool import Pool
+import uuid
 
 import numpy
 import xxhash
@@ -11,17 +8,12 @@ from judo.judo_backend import Backend
 
 
 class Hasher:
-
-    _true_hash = bool(Backend.use_true_hash())
-
     def __init__(self, seed: int = 0):
         self._seed = seed
-        if self._true_hash:
-            self.pool = Pool()
 
     @property
     def uses_true_hash(self) -> bool:
-        return self._true_hash
+        return Backend.use_true_hash()
 
     @staticmethod
     def hash_numpy(x: numpy.ndarray) -> int:
@@ -34,6 +26,10 @@ class Hasher:
         bytes = judo.to_numpy(x).tobytes()
         return xxhash.xxh32_intdigest(bytes)
 
+    @staticmethod
+    def get_one_id():
+        return uuid.uuid1().int >> 64
+
     @classmethod
     def true_hash_tensor(cls, x):
         funcs = {
@@ -42,32 +38,17 @@ class Hasher:
         }
         return Backend.execute(x, funcs)
 
-    def __del__(self):
-        self.pool.close()
-
-    def get_one_id(self):
-        self._seed += 1
-        return self._seed
-
-    def get_array_of_ids(self, n: int):
-        ids = numpy.arange(n) + self._seed + 1
-        self._seed += n + 1
-        return judo.as_tensor(ids)
-
     def hash_tensor(self, x):
-        if self._true_hash:
+        if self.uses_true_hash:
             return self.true_hash_tensor(x)
-        return 0
+        return self.get_one_id()
 
-    def hash_walkers(self, x):
-        if self._true_hash:
-            # hashes = self.pool.map(self.true_hash_tensor, x)
-            hashes = [self.true_hash_tensor(x_i) for x_i in x]
-            return judo.as_tensor(hashes)
-        return self.get_array_of_ids(x.shape[0])
+    def hash_iterable(self, x):
+        hashes = [self.hash_tensor(xi) for xi in x]
+        return judo.as_tensor(hashes, dtype=judo.dtype.hash_type)
 
     def hash_state(self, state):
-        if self._true_hash:
+        if self.uses_true_hash:
             _hash = hash(
                 tuple(
                     [
@@ -77,7 +58,7 @@ class Hasher:
                 ),
             )
             return _hash
-        return 0
+        return self.get_one_id()
 
 
 hasher = Hasher()

@@ -1,7 +1,8 @@
 import pytest
 
-import judo
+from judo import dtype
 from judo.data_structures.states import States
+from judo.functions.api import API
 
 
 states_classes = [States]
@@ -14,7 +15,7 @@ def states_class(request):
 
 class TestStates:
     def test_init_dict(self, states_class):
-        state_dict = {"name_1": {"size": tuple([1]), "dtype": judo.float32}}
+        state_dict = {"name_1": {"size": tuple([1]), "dtype": dtype.float32}}
         new_states = states_class(state_dict=state_dict, batch_size=2)
         assert new_states.n == 2
 
@@ -34,7 +35,7 @@ class TestStates:
         name_1 = "miau"
         val_1 = name_1
         name_2 = "elephant"
-        val_2 = judo.arange(10)
+        val_2 = API.arange(10)
         new_states = states_class(batch_size=2)
         new_states[name_1] = val_1
         new_states[name_2] = val_2
@@ -62,24 +63,24 @@ class TestStates:
         for s in new_states.split_states(batch_size):
             assert len(s) == 1
             assert s.test == "test"
-        data = judo.repeat(judo.arange(5).reshape(1, -1), batch_size, 0)
+        data = API.repeat(API.arange(5).reshape(1, -1), batch_size, 0)
         new_states = states_class(batch_size=batch_size, test="test", data=data)
         for s in new_states.split_states(batch_size):
             assert len(s) == 1
             assert s.test == "test"
-            assert bool((s.data == judo.arange(5)).all()), s.data
+            assert bool((s.data == API.arange(5)).all()), s.data
         chunk_len = 4
-        test_data = judo.repeat(judo.arange(5).reshape(1, -1), chunk_len, 0)
+        test_data = API.repeat(API.arange(5).reshape(1, -1), chunk_len, 0)
         for s in new_states.split_states(5):
             assert len(s) == chunk_len
             assert s.test == "test"
             assert (s.data == test_data).all(), (s.data.shape, test_data.shape)
 
         batch_size = 21
-        data = judo.repeat(judo.arange(5).reshape(1, -1), batch_size, 0)
+        data = API.repeat(API.arange(5).reshape(1, -1), batch_size, 0)
         new_states = states_class(batch_size=batch_size, test="test", data=data)
         chunk_len = 5
-        test_data = judo.repeat(judo.arange(5).reshape(1, -1), chunk_len, 0)
+        test_data = API.repeat(API.arange(5).reshape(1, -1), chunk_len, 0)
         split_states = list(new_states.split_states(5))
         for s in split_states[:-1]:
             assert len(s) == chunk_len
@@ -88,10 +89,10 @@ class TestStates:
 
         assert len(split_states[-1]) == 1
         assert split_states[-1].test == "test"
-        assert (split_states[-1].data == judo.arange(5)).all(), (s.data.shape, test_data.shape)
+        assert (split_states[-1].data == API.arange(5)).all(), (s.data.shape, test_data.shape)
 
     def test_get_params_dir(self, states_class):
-        state_dict = {"name_1": {"size": tuple([1]), "dtype": judo.float32}}
+        state_dict = {"name_1": {"size": tuple([1]), "dtype": dtype.float32}}
         new_states = states_class(state_dict=state_dict, batch_size=2)
         params_dict = new_states.get_params_dict()
         assert isinstance(params_dict, dict)
@@ -103,7 +104,7 @@ class TestStates:
 
     def test_merge_states(self, states_class):
         batch_size = 21
-        data = judo.repeat(judo.arange(5).reshape(1, -1), batch_size, 0)
+        data = API.repeat(API.arange(5).reshape(1, -1), batch_size, 0)
         new_states = states_class(batch_size=batch_size, test="test", data=data)
         split_states = tuple(new_states.split_states(batch_size))
         merged = new_states.merge_states(split_states)
