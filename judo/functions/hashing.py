@@ -1,4 +1,4 @@
-from uuid import uuid4
+import uuid
 
 import numpy
 import xxhash
@@ -31,7 +31,7 @@ class Hasher:
 
     @staticmethod
     def get_one_id():
-        return int(uuid4())
+        return uuid.uuid1().int >> 64
 
     @classmethod
     def true_hash_tensor(cls, x):
@@ -47,8 +47,8 @@ class Hasher:
         return self.get_one_id()
 
     def hash_iterable(self, x):
-        hashes = [self.true_hash_tensor(xi) if self._true_hash else self.get_one_id() for xi in x]
-        return judo.as_tensor(hashes)
+        hashes = [self.hash_tensor(xi) for xi in x]
+        return judo.as_tensor(hashes, dtype=judo.dtype.hash_type)
 
     def hash_state(self, state):
         if self._true_hash:

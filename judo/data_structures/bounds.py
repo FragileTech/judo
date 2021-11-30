@@ -5,6 +5,7 @@ import numpy
 
 import judo
 from judo.data_types import dtype
+from judo.functions.api import API
 from judo.judo_tensor import tensor
 from judo.typing import Scalar, Tensor
 
@@ -68,9 +69,9 @@ class Bounds:
             raise TypeError("If shape is None high or low need to have .shape attribute.")
         # High and low will be arrays of target shape
         if not judo.is_tensor(high):
-            high = tensor(high) if isinstance(high, _Iterable) else judo.ones(shape) * high
+            high = tensor(high) if isinstance(high, _Iterable) else API.ones(shape) * high
         if not judo.is_tensor(low):
-            low = tensor(low) if isinstance(low, _Iterable) else judo.ones(shape) * low
+            low = tensor(low) if isinstance(low, _Iterable) else API.ones(shape) * low
         self.high = judo.astype(high, dtype)
         self.low = judo.astype(low, dtype)
         if dtype is not None:
@@ -160,15 +161,15 @@ class Bounds:
 
         """
         pct = tensor(scale - 1)
-        big_scale = 1 + judo.abs(pct)
-        small_scale = 1 - judo.abs(pct)
+        big_scale = 1 + API.abs(pct)
+        small_scale = 1 - API.abs(pct)
         zero = judo.astype(tensor(0.0), low.dtype)
         if pct > 0:
-            xmin_scaled = judo.where(low < zero, low * big_scale, low * small_scale)
-            xmax_scaled = judo.where(high < zero, high * small_scale, high * big_scale)
+            xmin_scaled = API.where(low < zero, low * big_scale, low * small_scale)
+            xmax_scaled = API.where(high < zero, high * small_scale, high * big_scale)
         else:
-            xmin_scaled = judo.where(low < zero, low * small_scale, low * small_scale)
-            xmax_scaled = judo.where(high < zero, high * big_scale, high * small_scale)
+            xmin_scaled = API.where(low < zero, low * small_scale, low * small_scale)
+            xmax_scaled = API.where(high < zero, high * big_scale, high * small_scale)
         return xmin_scaled, xmax_scaled
 
     @classmethod
@@ -201,7 +202,7 @@ class Bounds:
             Bounds shape float64 dtype (3,) low [ 0.5 -7.5  0.5] high [1.5 1.5 1.5]
 
         """
-        xmin, xmax = judo.min(x, axis=0), judo.max(x, axis=0)
+        xmin, xmax = API.min(x, axis=0), API.max(x, axis=0)
         xmin_scaled, xmax_scaled = cls.get_scaled_intervals(xmin, xmax, scale)
         return Bounds(low=xmin_scaled, high=xmax_scaled)
 
@@ -216,7 +217,7 @@ class Bounds:
             Clipped numpy array with all its values inside the defined bounds.
 
         """
-        return judo.clip(judo.astype(x, dtype.float), self.low, self.high)
+        return API.clip(judo.astype(x, dtype.float), self.low, self.high)
 
     def points_in_bounds(self, x: Tensor) -> Union[Tensor, bool]:
         """

@@ -2,8 +2,7 @@ import numpy
 import pytest
 import torch
 
-import judo
-from judo import Backend
+from judo import Backend, dtype
 
 
 @pytest.fixture()
@@ -14,6 +13,6 @@ def backend():
 class TestDataTypes:
     def test_bool(self, backend):
         backend.set_backend("numpy")
-        assert judo.bool == numpy.bool_, judo.bool
+        assert dtype.bool == numpy.bool_, dtype.bool
         backend.set_backend("torch")
-        assert judo.bool == torch.bool
+        assert dtype.bool == torch.bool

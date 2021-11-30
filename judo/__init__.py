@@ -44,8 +44,8 @@ def __new_getattr(name):
         raise e
 
 
-# In python versions 3.7 + you don't need to import dtype and calling judo.float64 instead
-# of dtype.float64 will work
+# In python versions 3.7 + you don't need to import dtype,
+# and calling judo.float64 instead of dtype.float64 will work
 module = sys.modules[__name__]
 __old_getattr = getattr(module, "__getattr__", __base_getattr)
 module.__getattr__ = __new_getattr

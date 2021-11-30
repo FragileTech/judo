@@ -4,6 +4,7 @@ from judo.judo_tensor import astype, tensor
 
 
 AVAILABLE_FUNCTIONS = [
+    "abs",
     "argmax",
     "hash_numpy",
     "hash_tensor",
@@ -20,6 +21,11 @@ AVAILABLE_FUNCTIONS = [
     "tile",
     "logical_or",
     "logical_and",
+    "ones",
+    "zeros",
+    "arange",
+    "full_like",
+    "allclose",
 ]
 
 
@@ -125,3 +131,27 @@ def logical_or(a, b):
 
 def logical_and(a, b):
     return a & b
+
+
+def ones(*args, **kwargs):
+    return torch.ones(*args, **kwargs)
+
+
+def zeros(*args, **kwargs):
+    return torch.zeros(*args, **kwargs)
+
+
+def arange(*args, **kwargs):
+    return torch.arange(*args, **kwargs)
+
+
+def abs(*args, **kwargs):
+    return torch.abs(*args, **kwargs)
+
+
+def allclose(*args, **kwargs):
+    return torch.allclose(*args, **kwargs)
+
+
+def full_like(*args, **kwargs):
+    return torch.full_like(*args, **kwargs)

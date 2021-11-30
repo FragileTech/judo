@@ -76,7 +76,7 @@ def float64():
 
 def hash_type():
     funcs = {
-        "numpy": lambda x: numpy.dtype("<U64") if Backend.use_true_hash() else numpy.int64,
+        "numpy": lambda x: numpy.dtype("<U64") if Backend.use_true_hash() else numpy.uint64,
         "torch": lambda x: torch.int64,
     }
     return Backend.execute(None, funcs)
