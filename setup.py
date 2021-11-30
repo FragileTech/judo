@@ -13,6 +13,17 @@ version = SourceFileLoader(
 with open(Path(__file__).with_name("README.md"), encoding="utf-8") as f:
     long_description = f.read()
 
+# Module-specific dependencies.
+extras = {
+    "torch": ["torch>=1.0.0"],
+    "image": ["pillow>=7.0.0"],
+    "ipython": ["ipython >= 7.0.0"],
+    "data-structures": ["networkx > 2.0.0"],
+}
+
+# Meta dependency groups.
+extras["all"] = [item for group in extras.values() for item in group]
+
 setup(
     name="judo",
     description="API and data structures for efficient AI research.",
@@ -27,15 +38,11 @@ setup(
     keywords=["Machine learning", "artificial intelligence"],
     test_suite="tests",
     tests_require=["pytest>=5.3.5", "hypothesis>=5.6.0"],
-    extras_require={},
+    extras_require=extras,
     install_requires=[
         "numpy>=1.0.0",
         "pyyaml>=5.0.0",
         "xxhash>=1.1.0",
-        "pillow>=7.0.0",
-        "networkx > 2.0.0",
-        "ipython >= 7.0.0",
-        "torch>=1.0.0",
     ],
     package_data={"": ["README.md"], "judo": ["config.yml"]},
     classifiers=[

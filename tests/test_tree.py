@@ -1,8 +1,15 @@
-import networkx
 import pytest
 
-from judo.data_structures.tree import HistoryTree, NetworkxTree, to_node_id
-from judo.functions.api import API
+
+try:
+    import networkx
+
+    from judo.data_structures.tree import HistoryTree, NetworkxTree, to_node_id
+    from judo.functions.api import API
+
+    MISSING_IMPORTS = False
+except ImportError:
+    MISSING_IMPORTS = True
 
 
 def random_powerlaw():
@@ -32,6 +39,7 @@ def tree(request):
     return tree
 
 
+@pytest.mark.skipif(MISSING_IMPORTS, reason="networkx not installed")
 class TestNetworkxTree:
     def test_init(self, tree):
         pass
