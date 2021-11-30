@@ -95,7 +95,7 @@ class TestNetworkxTree:
         leafs = tree.get_leaf_nodes()
         path = tree.get_path_node_ids(leafs[0])
         other_path = tree.get_branch(leafs[0])
-        assert path == other_path
+        assert (path == other_path).all()
 
     def test_path_data_generator(self, tree):
         leaf = tree.get_leaf_nodes()[0]
