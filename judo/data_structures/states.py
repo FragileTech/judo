@@ -125,9 +125,9 @@ class States:
         """Return a unique id for a given attribute."""
         return hasher.hash_tensor(self[name])
 
-    def hash_walkers(self, name: str) -> List[int]:
+    def hash_attribute(self, name: str) -> List[int]:
         """Return a unique id for each walker attribute."""
-        return hasher.hash_walkers(self[name])
+        return hasher.hash_iterable(self[name])
 
     @staticmethod
     def merge_states(states: Iterable["States"]) -> "States":

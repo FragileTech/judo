@@ -4,6 +4,7 @@ from typing import Iterable, Optional, Tuple, Union
 import numpy
 
 import judo
+from judo.data_types import dtype
 from judo.judo_tensor import tensor
 from judo.typing import Scalar, Tensor
 
@@ -70,8 +71,8 @@ class Bounds:
             high = tensor(high) if isinstance(high, _Iterable) else judo.ones(shape) * high
         if not judo.is_tensor(low):
             low = tensor(low) if isinstance(low, _Iterable) else judo.ones(shape) * low
-        self.high = judo.astype(high, judo.float)
-        self.low = judo.astype(low, judo.float)
+        self.high = judo.astype(high, dtype)
+        self.low = judo.astype(low, dtype)
         if dtype is not None:
             self.dtype = dtype
         elif hasattr(high, "dtype"):
@@ -129,7 +130,7 @@ class Bounds:
         for lo, hi in bounds:
             low.append(lo)
             high.append(hi)
-        low, high = tensor(low, dtype=judo.float), tensor(high, dtype=judo.float)
+        low, high = tensor(low, dtype=dtype.float), tensor(high, dtype=dtype.float)
         return Bounds(low=low, high=high)
 
     @staticmethod
@@ -215,7 +216,7 @@ class Bounds:
             Clipped numpy array with all its values inside the defined bounds.
 
         """
-        return judo.clip(judo.astype(x, judo.float), self.low, self.high)
+        return judo.clip(judo.astype(x, dtype.float), self.low, self.high)
 
     def points_in_bounds(self, x: Tensor) -> Union[Tensor, bool]:
         """
@@ -231,7 +232,7 @@ class Bounds:
             Numpy array of booleans indicating if a row lies inside the bounds.
 
         """
-        match = self.clip(x) == judo.astype(x, judo.float)
+        match = self.clip(x) == judo.astype(x, dtype.float)
         return match.all(1).flatten() if len(match.shape) > 1 else match.all()
 
     def safe_margin(

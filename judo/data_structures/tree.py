@@ -149,6 +149,7 @@ class NetworkxTree(BaseTree):
             for name in self.names
             if name.lstrip(next_prefix) in edge_names
         ]
+        self._prune_sentinel = self.root_id
 
     def __len__(self) -> int:
         return self._node_count
@@ -188,11 +189,7 @@ class NetworkxTree(BaseTree):
 
         """
         ids, id_states = self.get_states_ids(**kwargs)
-        if hasher.uses_true_hash:
-            leaf_ids = judo.to_numpy(ids)
-        else:
-            leaf_ids = hasher.get_array_of_ids(len(id_states))
-        parent_ids = judo.to_numpy(parent_ids)
+        leaf_ids, parent_ids = judo.to_numpy(ids), judo.to_numpy(parent_ids)
         # Keep track of nodes that are active to make sure that they are not pruned
         self.last_added = set(leaf_ids) | set(parent_ids)
         for i, (leaf, parent) in enumerate(zip(leaf_ids, parent_ids)):
@@ -223,6 +220,7 @@ class NetworkxTree(BaseTree):
             alive_leafs = set(alive_leafs)
             dead_leafs = self.leafs - alive_leafs
             self.prune_dead_branches(dead_leafs=dead_leafs, alive_leafs=alive_leafs)
+        # self._update_prune_sentinel()
 
     def reset_graph(
         self,
@@ -250,6 +248,7 @@ class NetworkxTree(BaseTree):
         self.root_id = to_node_id(root_id) if root_id is not None else self.root_id
         self.data: nx.DiGraph = nx.DiGraph()
         self.data.add_node(self.root_id, epoch=epoch, **node_data)
+        self._prune_sentinel = self.root_id
         self._node_count = 1
         self.leafs = {self.root_id}
         self.last_added = set()
@@ -289,13 +288,15 @@ class NetworkxTree(BaseTree):
         # Don't add any leaf that creates a cycle in the graph
         if leaf_id not in self.data.nodes:
             if parent_id not in self.data.nodes:
-                raise ValueError("Parent not in graph")
+                raise ValueError(
+                    f"Parent {parent_id} of leaf {leaf_id} not in graph.",
+                )
             import copy
 
             self.data.add_node(leaf_id, epoch=epoch, **copy.deepcopy(node_data))
             self.data.add_edge(parent_id, leaf_id, **copy.deepcopy(edge_data))
-            #self.data.add_node(leaf_id, epoch=epoch, **node_data)
-            #self.data.add_edge(parent_id, leaf_id, **edge_data)
+            # self.data.add_node(leaf_id, epoch=epoch, **node_data)
+            # self.data.add_edge(parent_id, leaf_id, **edge_data)
             self.leafs.add(leaf_id)
             self._node_count += 1
             # If parent is no longer a leaf remove it from the list of leafs
@@ -343,7 +344,7 @@ class NetworkxTree(BaseTree):
         """
         leaf_id = to_node_id(leaf_id)
         if (
-            leaf_id == self.root_id
+            leaf_id == self._prune_sentinel
             or leaf_id in alive_nodes  # Remove only old nodes (inserted for 2+ epochs)
             or len(self.data.out_edges([leaf_id])) > 0  # Has children -> It's not a leaf
         ):
@@ -429,6 +430,12 @@ class NetworkxTree(BaseTree):
 
         """
         self.data = nx.compose(self.data, other.data)
+
+    def _update_prune_sentinel(self):
+        children_edges = self.data.out_edges([self._prune_sentinel])
+        while len(children_edges) == 1:
+            self._prune_sentinel = tuple(children_edges)[0][1]  # Update to child node
+            children_edges = self.data.out_edges([self._prune_sentinel])
 
     def _extract_data_from_states(
         self,

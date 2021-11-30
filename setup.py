@@ -36,6 +36,7 @@ setup(
         "networkx > 2.0.0",
         "ipython >= 7.0.0",
         "torch>=1.0.0",
+        "uuid>=1.0",
     ],
     package_data={"": ["README.md"], "judo": ["config.yml"]},
     classifiers=[
