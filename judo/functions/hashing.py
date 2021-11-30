@@ -8,15 +8,12 @@ from judo.judo_backend import Backend
 
 
 class Hasher:
-
-    _true_hash = bool(Backend.use_true_hash())
-
     def __init__(self, seed: int = 0):
         self._seed = seed
 
     @property
     def uses_true_hash(self) -> bool:
-        return self._true_hash
+        return Backend.use_true_hash()
 
     @staticmethod
     def hash_numpy(x: numpy.ndarray) -> int:
@@ -42,7 +39,7 @@ class Hasher:
         return Backend.execute(x, funcs)
 
     def hash_tensor(self, x):
-        if self._true_hash:
+        if self.uses_true_hash:
             return self.true_hash_tensor(x)
         return self.get_one_id()
 
@@ -51,7 +48,7 @@ class Hasher:
         return judo.as_tensor(hashes, dtype=judo.dtype.hash_type)
 
     def hash_state(self, state):
-        if self._true_hash:
+        if self.uses_true_hash:
             _hash = hash(
                 tuple(
                     [
