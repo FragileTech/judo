@@ -2,6 +2,8 @@ import copy
 from typing import Any, Dict, Generator, List, Set, Tuple, Union
 
 import networkx as nx
+import numpy
+import numpy as np
 
 import judo
 from judo.data_structures import States
@@ -386,7 +388,7 @@ class NetworkxTree(BaseTree):
             leaf_id = node
         return nodes[::-1]
 
-    def get_path_node_ids(self, leaf_id: NodeId, root_id: NodeId = None) -> List[NodeId]:
+    def get_path_node_ids(self, leaf_id: NodeId, root_id: NodeId = None) -> np.ndarray:
         """
         Get the data of the path between ``leaf_id`` and ``root_id``.
 
@@ -404,7 +406,7 @@ class NetworkxTree(BaseTree):
         leaf_id = to_node_id(leaf_id)
         root = root_id if root_id is not None else self.root_id
         nodes = nx.shortest_path(self.data, root, leaf_id)
-        return nodes
+        return numpy.array(nodes, dtype=judo.dtype.hash_type)
 
     def get_leaf_nodes(self) -> Tuple[NodeId]:
         """Return a list containing all the node ids of the leaves of the tree."""
