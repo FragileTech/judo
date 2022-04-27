@@ -86,7 +86,7 @@ def calculate_virtual_reward(
     distance_norm = relativize(distance.flatten())
     rewards_norm = relativize(rewards)
 
-    virtual_reward = distance_norm ** dist_coef * rewards_norm ** reward_coef * other_reward
+    virtual_reward = distance_norm**dist_coef * rewards_norm**reward_coef * other_reward
     return virtual_reward.flatten() if not return_compas else (virtual_reward.flatten(), compas)
 
 
@@ -148,8 +148,8 @@ def cross_virtual_reward(
     host_rewards = relativize(host_rewards)
     ext_rewards = relativize(ext_rewards)
 
-    host_vr = host_distance ** dist_coef * host_rewards ** reward_coef
-    ext_vr = ext_distance ** dist_coef * ext_rewards ** reward_coef
+    host_vr = host_distance**dist_coef * host_rewards**reward_coef
+    ext_vr = ext_distance**dist_coef * ext_rewards**reward_coef
     if return_compas:
         return (host_vr, compas_host), (ext_vr, compas_ext)
     return host_vr, ext_vr

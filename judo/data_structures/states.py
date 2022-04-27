@@ -1,5 +1,5 @@
 import copy
-from typing import Dict, Generator, Iterable, List, Optional, Tuple, Union
+from typing import Any, Dict, Generator, Iterable, List, Optional, Tuple, Union
 
 import numpy
 
@@ -8,6 +8,38 @@ from judo.functions.api import API
 from judo.functions.hashing import hasher
 from judo.judo_tensor import tensor
 from judo.typing import StateDict, Tensor
+
+
+def params_to_tensor(
+    n_walkers: int,
+    shape: Optional[tuple] = None,
+    size: Optional[tuple] = None,
+    **params: Dict[str, Any],
+) -> Tensor:
+    """
+    Create a dictionary containing the arrays specified by param_dict.
+
+    Args:
+        shape: Shape
+        params: Dictionary defining the additional parameters for initializing the tensor.
+        n_walkers: Number items in the first dimension of the data tensors.
+        size: Shape of the target tensor without accounting for the batch_size dimension.
+
+    Returns:
+          Dictionary with the same keys as param_dict, containing arrays specified \
+          by `param_dict` values.
+
+    """
+
+    # Shape already includes the number of walkers. Remove walkers axis to create size.
+    if shape is not None and len(shape) > 1:
+        val_size = shape[1:]
+    else:
+        val_size = size
+    # Create appropriate shapes with current state's number of walkers.
+    sizes = n_walkers if val_size is None else tuple([n_walkers]) + val_size
+    param_tensor = API.zeros(sizes, **params)
+    return param_tensor
 
 
 class States:
@@ -22,6 +54,7 @@ class States:
 
         state_dict = {"name_1": {"size": tuple([1]),
                                  "dtype": numpy.float32,
+                                 "is_array": True,
                                 },
                      }
 
@@ -53,7 +86,7 @@ class States:
         attr_dict = self.params_to_arrays(state_dict, batch_size) if state_dict is not None else {}
         attr_dict.update(kwargs)
         self._tensor_names = [k for k, v in attr_dict.items() if judo.is_tensor(v)]
-        self._names = list(attr_dict.keys())
+        self._names = tuple(attr_dict.keys())
         self._attr_dict = attr_dict
         self.update(**self._attr_dict)
         self._batch_size = batch_size
@@ -106,7 +139,7 @@ class States:
 
         """
         if key not in self._names:
-            self._names.append(key)
+            self._names += (key,)
         self.update(**{key: value})
 
     def __repr__(self):

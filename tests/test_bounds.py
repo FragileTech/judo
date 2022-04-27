@@ -46,7 +46,7 @@ class TestBounds:
 
     def test_points_in_bounds(self, bounds_fixture):
         points = tensor([[0, 0, 0], [11, 0, 0], [0, 11, 0], [11, 11, 11]])
-        res = bounds_fixture.points_in_bounds(points)
+        res = bounds_fixture.contains(points)
         for a, b in zip(res.tolist(), [True, False, False, False]):
             assert a == b
 

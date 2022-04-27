@@ -155,3 +155,7 @@ def allclose(*args, **kwargs):
 
 def full_like(*args, **kwargs):
     return torch.full_like(*args, **kwargs)
+
+
+def mod(*args, **kwargs):
+    return torch.fmod(*args, **kwargs)

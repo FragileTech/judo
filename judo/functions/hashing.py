@@ -18,7 +18,7 @@ class Hasher:
     @staticmethod
     def hash_numpy(x: numpy.ndarray) -> int:
         """Return a value that uniquely identifies a numpy array."""
-        x = x.astype("|S576") if x.dtype == "O" else x
+        # x = x.astype("|S576") if x.dtype == "O" else x
         return xxhash.xxh64_hexdigest(x.tobytes())
 
     @staticmethod
@@ -40,6 +40,7 @@ class Hasher:
 
     def hash_tensor(self, x):
         if self.uses_true_hash:
+            x = x if judo.is_tensor(x) else judo.tensor([x])
             return self.true_hash_tensor(x)
         return self.get_one_id()
 

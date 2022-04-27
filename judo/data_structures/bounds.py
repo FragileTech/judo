@@ -74,6 +74,7 @@ class Bounds:
             low = tensor(low) if isinstance(low, _Iterable) else API.ones(shape) * low
         self.high = judo.astype(high, dtype)
         self.low = judo.astype(low, dtype)
+        self._bounds_dist = self.high - self.low
         if dtype is not None:
             self.dtype = dtype
         elif hasattr(high, "dtype"):
@@ -95,6 +96,9 @@ class Bounds:
     def __len__(self) -> int:
         """Return the number of dimensions of the bounds."""
         return len(self.high)
+
+    def __contains__(self, item):
+        return self.contains(item)
 
     @property
     def shape(self) -> Tuple:
@@ -133,6 +137,11 @@ class Bounds:
             high.append(hi)
         low, high = tensor(low, dtype=dtype.float), tensor(high, dtype=dtype.float)
         return Bounds(low=low, high=high)
+
+    @classmethod
+    def from_space(cls, space: "gym.spaces.box.Box") -> "Bounds":  # noqa: F821
+        """Initialize a :class:`Bounds` from a :class:`Box` gym action space."""
+        return Bounds(low=space.low, high=space.high, dtype=space.dtype)
 
     @staticmethod
     def get_scaled_intervals(
@@ -219,7 +228,42 @@ class Bounds:
         """
         return API.clip(judo.astype(x, dtype.float), self.low, self.high)
 
-    def points_in_bounds(self, x: Tensor) -> Union[Tensor, bool]:
+    def pbc(self, x: Tensor) -> Tensor:
+        """
+        Calculate periodic boundary conditions of the target array to fall inside \
+        the bounds (closed interval).
+
+        Args:
+            x: Tensor to apply the periodic boundary conditions.
+
+        Returns:
+            Periodic boundary condition so all the values are inside the defined bounds.
+
+        """
+        x = judo.astype(x, dtype.float)
+        x = API.where(x < self.high, x, API.mod(x, self.high) + self.low)
+        x = API.where(x > self.low, x, self.high - API.mod(x, self.low))
+        return x  # API.mod(, self.high)
+
+    def pbc_distance(self, x: Tensor, y: Tensor) -> Tensor:
+        """
+        Calculate periodic boundary conditions of the target array to fall inside \
+        the bounds (closed interval).
+
+        Args:
+            x: Tensor to apply the periodic boundary conditions.
+            y: Tensor containing the frontier of the periodic boundary condition.
+
+        Returns:
+            Periodic boundary condition so all the values are inside the defined bounds.
+
+        """
+        x, y = judo.astype(x, dtype.float), judo.astype(y, dtype.float)
+        delta = numpy.abs(x - y)
+        delta = API.where(x > 0.5 * self._bounds_dist, delta - self._bounds_dist, delta)
+        return delta
+
+    def contains(self, x: Tensor) -> Union[Tensor, bool]:
         """
         Check if the rows of the target array have all their coordinates inside \
         specified bounds.
@@ -286,3 +330,27 @@ class Bounds:
 
         """
         return tuple([dim for dim in zip(self.low, self.high)])
+
+    def to_space(self) -> "gym.spaces.box.Box":  # noqa: F821
+        """Return a :class:`Box` gym space with the same characteristics as the :class:`Bounds`."""
+        from gym.spaces.box import Box
+
+        high = judo.to_numpy(self.high)
+        return Box(low=judo.to_numpy(self.low), high=high, dtype=high.dtype)
+
+    def points_in_bounds(self, x: Tensor) -> Union[Tensor, bool]:
+        """
+        Check if the rows of the target array have all their coordinates inside \
+        specified bounds.
+
+        If the array is one dimensional it will return a boolean, otherwise a vector of booleans.
+
+        Args:
+            x: Array to be checked against the bounds.
+
+        Returns:
+            Numpy array of booleans indicating if a row lies inside the bounds.
+
+        """
+        match = self.clip(x) == judo.astype(x, dtype.float)
+        return match.all(1).flatten() if len(match.shape) > 1 else match.all()

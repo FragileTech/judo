@@ -116,3 +116,7 @@ def allclose(*args, **kwargs):
 
 def full_like(*args, **kwargs):
     return numpy.full_like(*args, **kwargs)
+
+
+def mod(*args, **kwargs):
+    return numpy.mod(*args, **kwargs)
