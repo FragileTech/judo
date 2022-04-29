@@ -19,12 +19,12 @@ class Hasher:
     def hash_numpy(x: numpy.ndarray) -> int:
         """Return a value that uniquely identifies a numpy array."""
         # x = x.astype("|S576") if x.dtype == "O" else x
-        return xxhash.xxh64_hexdigest(x.tobytes())
+        return int(xxhash.xxh64_intdigest(x.tobytes()))
 
     @staticmethod
     def hash_torch(x):
         bytes = judo.to_numpy(x).tobytes()
-        return xxhash.xxh32_intdigest(bytes)
+        return int(hex(xxhash.xxh32_intdigest(bytes)))
 
     @staticmethod
     def get_one_id():
