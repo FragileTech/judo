@@ -1,7 +1,7 @@
+import numpy as np
 import pytest
 
 
-pytest.skip(allow_module_level=True)
 try:
     import networkx
 
@@ -94,13 +94,13 @@ class TestNetworkxTree:
 
     def test_get_path_node_ids(self, tree):
         leafs = tree.get_leaf_nodes()
-        path = tree.get_path_node_ids(leafs[0])
-        other_path = tree.get_branch(leafs[0])
-        assert (path == other_path).all()
+        path = np.array([to_node_id(n) for n in tree.get_path_node_ids(leafs[0])])
+        other_path = np.array([to_node_id(n) for n in tree.get_branch(leafs[0])])
+        assert (path == other_path).all(), (path, other_path)
 
     def test_path_data_generator(self, tree):
         leaf = tree.get_leaf_nodes()[0]
-        path = tree.get_path_node_ids(leaf)
+        path = [to_node_id(n) for n in tree.get_path_node_ids(leaf)]
         data = list(tree.path_data_generator(path))
         assert len(data) == len(path) - 1
         assert len(data[0]) == 2
