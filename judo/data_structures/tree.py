@@ -327,7 +327,6 @@ class NetworkxTree(BaseTree):
         alive_nodes = alive_leafs | self.last_added
         for leaf in set(dead_leafs):
             self.prune_branch(leaf, alive_nodes)
-        return
 
     def prune_branch(self, leaf_id: NodeId, alive_nodes: Set[NodeId]) -> None:
         """
