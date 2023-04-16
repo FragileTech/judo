@@ -69,9 +69,9 @@ class Bounds:
             raise TypeError("If shape is None high or low need to have .shape attribute.")
         # High and low will be arrays of target shape
         if not judo.is_tensor(high):
-            high = tensor(high) if isinstance(high, _Iterable) else API.ones(shape) * high
+            high = tensor(high) if isinstance(high, _Iterable) else tensor(API.ones(shape) * high)
         if not judo.is_tensor(low):
-            low = tensor(low) if isinstance(low, _Iterable) else API.ones(shape) * low
+            low = tensor(low) if isinstance(low, _Iterable) else tensor(API.ones(shape) * low)
         self.high = judo.astype(high, dtype)
         self.low = judo.astype(low, dtype)
         self._bounds_dist = self.high - self.low
@@ -259,7 +259,7 @@ class Bounds:
 
         """
         x, y = judo.astype(x, dtype.float), judo.astype(y, dtype.float)
-        delta = numpy.abs(x - y)
+        delta = judo.abs(x - y)
         delta = API.where(x > 0.5 * self._bounds_dist, delta - self._bounds_dist, delta)
         return delta
 
