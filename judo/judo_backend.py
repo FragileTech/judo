@@ -26,11 +26,11 @@ except ImportError:
 
 
 FALLBACK_DEFAULTS = {
-    "backend": "numpy",
-    "device": "cpu",
-    "requires_grad": None,
-    "true_hash": False,
-    "copy": False,
+    "backend": os.getenv("JUDO_BACKEND_NAME", default="numpy"),
+    "device": os.getenv("JUDO_BACKEND_DEVICE", default="cpu"),
+    "requires_grad": os.getenv("JUDO_BACKEND_REQUIRES_GRAD", default=None),
+    "true_hash": bool(os.getenv("JUDO_BACKEND_TRUE_HASH", default=False)),
+    "copy": os.getenv("JUDO_BACKEND_COPY", default=False),
 }
 config_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "config.yml")
 
