@@ -26,11 +26,11 @@ except ImportError:
 
 
 FALLBACK_DEFAULTS = {
-    "backend": os.getenv("JUDO_BACKEND_NAME", default="numpy"),
-    "device": os.getenv("JUDO_BACKEND_DEVICE", default="cpu"),
-    "requires_grad": os.getenv("JUDO_BACKEND_REQUIRES_GRAD", default=None),
-    "true_hash": bool(os.getenv("JUDO_BACKEND_TRUE_HASH", default=False)),
-    "copy": os.getenv("JUDO_BACKEND_COPY", default=False),
+    "backend": "numpy",
+    "device": "cpu",
+    "requires_grad": False,
+    "true_hash": False,
+    "copy": False,
 }
 config_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "config.yml")
 
@@ -43,15 +43,20 @@ def load_backend_config(filepath=config_file):
         with open(filepath, "w") as file:
             yaml.dump(FALLBACK_DEFAULTS, file)
         config = FALLBACK_DEFAULTS
-    backend = config.get("backend", FALLBACK_DEFAULTS["backend"])
-    device = config.get("device", FALLBACK_DEFAULTS["device"])
+    default_backend = config.get("backend", FALLBACK_DEFAULTS["backend"])
+    backend = os.getenv("JUDO_BACKEND_NAME", default_backend)
+    default_device = config.get("device", FALLBACK_DEFAULTS["device"])
+    device = os.getenv("JUDO_BACKEND_DEVICE", default_device)
     if device == "auto":
         device = "cuda" if torch.cuda.is_available() else "cpu"
     elif str(device).lower() == "none":
         device = None
-    requires_grad = config.get("requires_grad", FALLBACK_DEFAULTS["requires_grad"])
-    true_hash = config.get("true_hash", FALLBACK_DEFAULTS["true_hash"])
-    copy = config.get("copy", FALLBACK_DEFAULTS["copy"])
+    default_requires_grad = config.get("requires_grad", FALLBACK_DEFAULTS["requires_grad"])
+    requires_grad = os.getenv("JUDO_BACKEND_REQUIRES_GRAD", default_requires_grad)
+    default_true_hash = config.get("true_hash", FALLBACK_DEFAULTS["true_hash"])
+    true_hash = os.getenv("JUDO_BACKEND_TRUE_HASH", default_true_hash)
+    default_copy = config.get("copy", FALLBACK_DEFAULTS["copy"])
+    copy = os.getenv("JUDO_BACKEND_COPY", default_copy)
     return backend, device, requires_grad, true_hash, copy
 
 

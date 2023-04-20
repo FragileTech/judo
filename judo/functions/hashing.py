@@ -34,7 +34,8 @@ class Hasher:
     def true_hash_tensor(cls, x):
         funcs = {
             "numpy": cls.hash_numpy,
-            "torch": cls.hash_torch,
+            # For now let's make hashers use numpy
+            "torch": lambda x: cls.hash_numpy(judo.to_numpy(x)),
         }
         return Backend.execute(x, funcs)
 
@@ -46,7 +47,12 @@ class Hasher:
 
     def hash_iterable(self, x):
         hashes = [self.hash_tensor(xi) for xi in x]
-        return judo.as_tensor(hashes, dtype=judo.dtype.hash_type)
+        try:
+            with judo.Backend.use_backend("numpy"):
+                return judo.as_tensor(hashes, dtype=judo.dtype.hash_type)
+        except RuntimeError as e:
+            x = judo.as_tensor(x)
+            raise ValueError(f"Could not hash iterable {x} with dtype {x.dtype} because {e}.")
 
     def hash_state(self, state):
         if self.uses_true_hash:
