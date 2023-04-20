@@ -1,5 +1,6 @@
-backend: numpy
-copy: false
+backend: torch
+copy: False
+default_backend: torch
 device: cpu
-requires_grad: null
-true_hash: true
+requires_grad: False
+true_hash: False

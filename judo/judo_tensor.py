@@ -55,7 +55,7 @@ def _new_torch_tensor_avoid_copy(x, dtype=None, device=None, requires_grad=None)
         y = torch.as_tensor(x, dtype=dtype, device=device)
     return (
         y
-        if requires_grad is not None or not requires_grad or not is_floating_tensor(y)
+        if (requires_grad is not None and not requires_grad) or not is_floating_tensor(y)
         else y.requires_grad_()
     )
 
